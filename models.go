@@ -17,10 +17,11 @@ type Visit struct {
 }
 
 type Job struct {
-    JobID    int            `json:"job_id"`
-    Status   string         `json:"status"`
-    Errors   []ErrorDetail  `json:"error,omitempty"`
-    mu       sync.Mutex
+    JobID        int            `json:"job_id"`
+    Status       string         `json:"status"`
+    Errors       []ErrorDetail  `json:"error,omitempty"`
+    ImageResults []ImageResult  `json:"image_results,omitempty"`
+    mu           sync.Mutex
 }
 
 type ErrorDetail struct {
@@ -33,12 +34,20 @@ type JobResponse struct {
 }
 
 type StatusResponse struct {
-    Status string        `json:"status"`
-    JobID  int          `json:"job_id"`
-    Error  []ErrorDetail `json:"error,omitempty"`
+    Status  string        `json:"status"`
+    JobID   int           `json:"job_id"`
+    Error   []ErrorDetail `json:"error,omitempty"`
+    Results []ImageResult `json:"results,omitempty"`
 }
 
 var (
     jobs    = make(map[int]*Job)
     jobsMux sync.RWMutex
 )
+
+type ImageResult struct {
+    URL       string `json:"url"`
+    Width     int    `json:"width"`
+    Height    int    `json:"height"`
+    Perimeter int    `json:"perimeter"`
+}

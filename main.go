@@ -14,7 +14,7 @@ func main() {
 
     r := mux.NewRouter()
     r.HandleFunc("/api/submit/", SubmitJobHandler).Methods("POST")
-    r.HandleFunc("/api/status/", GetJobStatusHandler).Methods("GET")
+    r.HandleFunc("/api/status", GetJobStatusHandler).Methods("GET")
 
     log.Println("Server running on http://localhost:8080")
     log.Fatal(http.ListenAndServe(":8080", r))

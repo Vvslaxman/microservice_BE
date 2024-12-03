@@ -6,28 +6,46 @@ import (
     "strconv"
     "time"
 	"log"
+	"github.com/gorilla/mux"
 )
-
 func SubmitJobHandler(w http.ResponseWriter, r *http.Request) {
-	log.Printf("Received submit request")
+    log.Printf("Received submit request")
     var req JobRequest
     if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
         log.Printf("Error decoding request: %v", err)
-		http.Error(w, `{"error": "Invalid request body"}`, http.StatusBadRequest)
+        http.Error(w, `{"error": "Invalid request body"}`, http.StatusBadRequest)
         return
     }
 
     if req.Count != len(req.Visits) {
-		log.Printf("Count mismatch: expected %d, got %d visits", req.Count, len(req.Visits))
+        log.Printf("Count mismatch: expected %d, got %d visits", req.Count, len(req.Visits))
         http.Error(w, `{"error": "Count does not match number of visits"}`, http.StatusBadRequest)
         return
     }
-	// Validate store IDs first
+
+    // Validate store IDs and image URLs
     for _, visit := range req.Visits {
+        // First, validate store ID
         if !ValidateStore(visit.StoreID) {
             log.Printf("Invalid store ID: %s", visit.StoreID)
             http.Error(w, `{"error": "Invalid store ID"}`, http.StatusBadRequest)
             return
+        }
+
+        // Check if image URLs exist and are not empty
+        if len(visit.ImageURLs) == 0 {
+            log.Printf("No image URLs for store ID: %s", visit.StoreID)
+            http.Error(w, `{"error": "No image URLs provided"}`, http.StatusBadRequest)
+            return
+        }
+
+        // Additional check for empty URLs
+        for _, url := range visit.ImageURLs {
+            if url == "" {
+                log.Printf("Empty image URL for store ID: %s", visit.StoreID)
+                http.Error(w, `{"error": "Empty image URL found"}`, http.StatusBadRequest)
+                return
+            }
         }
     }
 
@@ -52,11 +70,19 @@ func SubmitJobHandler(w http.ResponseWriter, r *http.Request) {
     json.NewEncoder(w).Encode(response)
     log.Printf("Created job with ID: %d", jobID)
 }
-
 func GetJobStatusHandler(w http.ResponseWriter, r *http.Request) {
-    jobID, err := strconv.Atoi(r.URL.Query().Get("jobid"))
+    vars := mux.Vars(r)
+    jobIDStr := r.URL.Query().Get("jobid")
+    
+    // Fallback to path variable if query parameter is not present
+    if jobIDStr == "" {
+        jobIDStr = vars["jobid"]
+    }
+
+    jobID, err := strconv.Atoi(jobIDStr)
     if err != nil {
-        http.Error(w, "{}", http.StatusBadRequest)
+        log.Printf("Invalid job ID: %s", jobIDStr)
+        http.Error(w, `{"error": "Invalid job ID"}`, http.StatusBadRequest)
         return
     }
 
@@ -65,14 +91,16 @@ func GetJobStatusHandler(w http.ResponseWriter, r *http.Request) {
     jobsMux.RUnlock()
 
     if !exists {
-        http.Error(w, "{}", http.StatusBadRequest)
+        log.Printf("Job not found: %d", jobID)
+        http.Error(w, `{"error": "Job not found"}`, http.StatusNotFound)
         return
     }
 
     w.Header().Set("Content-Type", "application/json")
     json.NewEncoder(w).Encode(StatusResponse{
-        Status: job.Status,
-        JobID:  job.JobID,
-        Error:  job.Errors,
+        Status:  job.Status,
+        JobID:   job.JobID,
+        Error:   job.Errors,
+        Results: job.ImageResults,
     })
 }
