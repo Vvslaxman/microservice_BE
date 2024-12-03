@@ -3,11 +3,28 @@ package main
 import (
     "encoding/json"
     "net/http"
+	"net/url"
     "strconv"
     "time"
 	"log"
 	"github.com/gorilla/mux"
 )
+func isValidURL(urlStr string) bool {
+    // Basic URL validation
+    if urlStr == "" {
+        return false
+    }
+    
+    // Parse the URL
+    u, err := url.Parse(urlStr)
+    if err != nil {
+        return false
+    }
+    
+    // Check for valid scheme and host
+    return u.Scheme == "http" || u.Scheme == "https" && u.Host != ""
+}
+
 func SubmitJobHandler(w http.ResponseWriter, r *http.Request) {
     log.Printf("Received submit request")
     var req JobRequest
@@ -25,29 +42,29 @@ func SubmitJobHandler(w http.ResponseWriter, r *http.Request) {
 
     // Validate store IDs and image URLs
     for _, visit := range req.Visits {
-        // First, validate store ID
-        if !ValidateStore(visit.StoreID) {
-            log.Printf("Invalid store ID: %s", visit.StoreID)
-            http.Error(w, `{"error": "Invalid store ID"}`, http.StatusBadRequest)
-            return
-        }
-
-        // Check if image URLs exist and are not empty
-        if len(visit.ImageURLs) == 0 {
-            log.Printf("No image URLs for store ID: %s", visit.StoreID)
-            http.Error(w, `{"error": "No image URLs provided"}`, http.StatusBadRequest)
-            return
-        }
-
-        // Additional check for empty URLs
-        for _, url := range visit.ImageURLs {
-            if url == "" {
-                log.Printf("Empty image URL for store ID: %s", visit.StoreID)
-                http.Error(w, `{"error": "Empty image URL found"}`, http.StatusBadRequest)
-                return
-            }
-        }
-    }
+		// First, validate store ID
+		if !ValidateStore(visit.StoreID) {
+			log.Printf("Invalid store ID: %s", visit.StoreID)
+			http.Error(w, `{"error": "Invalid store ID"}`, http.StatusBadRequest)
+			return
+		}
+	
+		// Check if image URLs exist and are not empty
+		if len(visit.ImageURLs) == 0 {
+			log.Printf("No image URLs for store ID: %s", visit.StoreID)
+			http.Error(w, `{"error": "No image URLs provided"}`, http.StatusBadRequest)
+			return
+		}
+	
+		// Validate each URL
+		for _, url := range visit.ImageURLs {
+			if !isValidURL(url) {
+				log.Printf("Invalid or empty URL for store ID: %s", visit.StoreID)
+				http.Error(w, `{"error": "Invalid image URL"}`, http.StatusBadRequest)
+				return
+			}
+		}
+	}
 
     // Create new job
     jobID := int(time.Now().UnixNano() % 1000000)
