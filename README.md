@@ -1,7 +1,7 @@
 # Store Image Processing Service
 
 ## Project Directory
-
+```
 /kiranaC_BE
   ├── data/
   │   ├── StoreMasterAssignment.csv
@@ -14,6 +14,7 @@
   ├── models.go
   ├── processor.go
   ├── store_data.go
+```
 
 
 ## Description
