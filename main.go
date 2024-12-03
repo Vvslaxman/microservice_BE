@@ -1,24 +1,21 @@
 package main
 
 import (
-	"fmt"
-	"log"
-	"net/http"
-	"kiranaC_BE/models"
-	"kiranaC_BE/routes"
+    "log"
+    "net/http"
+    "github.com/gorilla/mux"
 )
 
 func main() {
-	var err error
-	// Load store data into routes.StoreData
-	routes.StoreData, err = models.LoadStores("D://kiranaC_BE//data//StoreMasterAssignment.csv")
-	if err != nil {
-		log.Fatalf("Failed to load store data: %v", err)
-	}
+    // Load store data
+    if err := LoadStoreData("data/StoreMasterAssignment.csv"); err != nil {
+        log.Fatalf("Failed to load store data: %v", err)
+    }
 
-	http.HandleFunc("/api/submit", routes.SubmitJobHandler)
-	http.HandleFunc("/api/status", routes.StatusHandler)
+    r := mux.NewRouter()
+    r.HandleFunc("/api/submit/", SubmitJobHandler).Methods("POST")
+    r.HandleFunc("/api/status/", GetJobStatusHandler).Methods("GET")
 
-	fmt.Println("Server running on http://localhost:8080")
-	log.Fatal(http.ListenAndServe(":8080", nil))
+    log.Println("Server running on http://localhost:8080")
+    log.Fatal(http.ListenAndServe(":8080", r))
 }
