@@ -1,5 +1,21 @@
 # Store Image Processing Service
 
+## Project Directory
+
+/kiranaC_BE
+  ├── data/
+  │   ├── StoreMasterAssignment.csv
+  ├── Dockerfile
+  ├── docker-compose.yml
+  ├── go.mod
+  ├── go.sum
+  ├── main.go 
+  ├── handlers.go
+  ├── models.go
+  ├── processor.go
+  ├── store_data.go
+
+
 ## Description
 A microservice for processing store images, validating store IDs, and generating job results with image metadata.
 
