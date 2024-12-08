@@ -114,3 +114,7 @@ While these Docker configurations are designed for production use, minor adjustm
 ## Results
 
 ![Terminal Output](terminal-output.png)
+
+![Testcase for Success](tc_success.png)
+
+![Testcase for Failure](tc_fail.png)
