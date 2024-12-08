@@ -112,9 +112,9 @@ A microservice for processing store images, validating store IDs, and generating
 While these Docker configurations are designed for production use, minor adjustments might be necessary. It’s strongly recommended to validate these configurations and test the setup before relying on them in a production environment. For immediate use, running the project with ```go run .``` is the preferred and simpler approach.
 
 ## Results
-
+#### Terminal Output
 ![Terminal Output](terminal-output.png)
-
+#### Testcase for Success (POST method with valid body and GET the status)
 ![Testcase for Success](tc_success.png)
-
+#### Testcase for Failure (POST method with valid body and GET the status)
 ![Testcase for Failure](tc_fail.png)
