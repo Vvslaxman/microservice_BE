@@ -113,7 +113,7 @@ While these Docker configurations are designed for production use, minor adjustm
 
 ## Results
 #### Terminal Output
-![Terminal Output](terminal-output.png)
+![Terminal Output](terminal_output.png)
 #### Testcase for Success (POST method with valid body and GET the status)
 ![Testcase for Success](tc_success.png)
 #### Testcase for Failure (POST method with valid body and GET the status)
