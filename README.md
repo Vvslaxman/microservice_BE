@@ -2,7 +2,7 @@
 
 ## Project Directory
 ```
-/kiranaC_BE
+/microservice_BE
   ├── data/
   │   ├── StoreMasterAssignment.csv
   ├── Dockerfile
