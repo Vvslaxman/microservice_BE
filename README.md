@@ -116,5 +116,5 @@ While these Docker configurations are designed for production use, minor adjustm
 ![Terminal Output](terminal_output.png)
 #### Testcase for Success (POST method with valid body and GET the status)
 ![Testcase for Success](tc_success.png)
-#### Testcase for Failure (POST method with valid body and GET the status)
+#### Testcase for Failure (POST method with partially invalid body and GET the status)
 ![Testcase for Failure](tc_fail.png)
